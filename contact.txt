@@ -1,0 +1,1369 @@
+package com.ck.contacts
+
+import java.lang.Exception
+import java.util.*
+import kotlin.concurrent.fixedRateTimer
+import kotlin.jvm.internal.PropertyReference0Impl
+
+fun main() {
+    val contactApp = ContactApp()
+    contactApp.showOption()
+}
+
+class ContactApp {
+
+
+    val contactList = mutableListOf<Contact>()
+    val scanner = Scanner(System.`in`)
+    fun showOption() {
+        println("1. Create ")
+        println("2. Display")
+        println("3. Search")
+        println("4. Edit")
+        println("5. Delete")
+        println("6. Exit")
+
+        try {
+            var options = scanner.nextLine()
+            when (options) {
+                "1" -> createContact()
+                "2" -> {
+                    if (contactList.isNotEmpty()) {
+                        display()
+                        showOption()
+                    } else {
+                        println("No results found")
+                        println(" Please Create Contact to display ")
+                        showOption()
+                    }
+
+                }
+
+                "3" -> {
+                    if (contactList.isNotEmpty()) {
+                        search()
+                    } else {
+                        println("No results found")
+                        println(" Please Create Contact to search ")
+                        showOption()
+
+
+                    }
+                }
+                "4" -> {
+                    editStart()
+
+                }
+                "5" -> {
+                    if (contactList.isNotEmpty()) {
+
+                        delete()
+                    } else {
+                        println("Nothing to delete")
+                        println(" Please Create Contact to delete ")
+                        showOption()
+
+
+                    }
+                }
+
+                "6" -> exit()
+                else -> {
+                    println("Something went wrong")
+                    println("Enter a valid input")
+                    showOption()
+
+                }
+            }
+        } catch (ex: Exception) {
+            println(ex)
+            println("Something went wrong")
+            println("Enter a valid input.")
+            // scanner.nextLine()
+            showOption()
+        }
+    }
+
+    fun editStart() {
+        if (contactList.isNotEmpty()) {
+            display()
+            println("Enter position")
+            var position = scanner.nextLine().toInt()
+            if (position > contactList.size - 1) {
+                println("Invalid input Enter a valid input")
+                println("Enter position")
+                editStart()
+//                var position1 = scanner.nextInt().toInt()
+//                edit(contactList[position1])
+            }
+
+            edit(contactList[position])
+        } else {
+            println("No results found")
+            println(" Please Create Contact to edit ")
+            showOption()
+
+        }
+
+    }
+
+    fun exit() {
+
+        println("Thank you have a great day")
+
+    }
+
+    fun search() {
+
+        if (contactList.isNotEmpty()) {
+            println("Search")
+            var inputString = scanner.nextLine()
+
+
+            for (items in contactList.indices) {
+                if (contactList[items].toString().contains(inputString, ignoreCase = true)) {
+                    println(contactList[items].name)
+                    println(contactList[items].phoneNumber)
+                    println(contactList[items].mailId)
+                    println(contactList[items].address)
+
+
+                } else "No contact found"
+
+            }
+            showOption()
+        } else {
+            println("Nothing to Edit")
+            println(" Please Create Contact to edit ")
+        }
+    }
+
+
+    fun edit(pContact1: Contact) {
+
+
+        var pPhoneList = mutableListOf<MutableList<String>>()
+        var wPhoneList = mutableListOf<MutableList<String>>()
+        var oPhoneList = mutableListOf<MutableList<String>>()
+        var otherPhoneList = mutableListOf<MutableList<String>>()
+
+        var personalMailList = mutableListOf<MutableList<String>>()
+        var officeMailList = mutableListOf<MutableList<String>>()
+        var otherMailList = mutableListOf<MutableList<String>>()
+
+        var homeAddressList = mutableListOf<MutableList<Address>>()
+        var residentAddressList = mutableListOf<MutableList<Address>>()
+        var officeAddressList = mutableListOf<MutableList<Address>>()
+        var otherAddressList = mutableListOf<MutableList<Address>>()
+
+
+        println("                     Name   -> ${pContact1.name}")
+        println("                     Emails -> ${pContact1.mailId}")
+        println("               phoneNumbers -> ${pContact1.phoneNumber}")
+        println("                    Address ->${pContact1.address}")
+
+        println(" 1. Edit name")
+        println(" 2. Edit phone number")
+        println(" 3. Edit EmailId")
+        println(" 4. Edit Address")
+        println("What would you like to edit")
+
+        var inputEdit = scanner.nextLine()
+        when (inputEdit) {
+            "1" -> {
+                println("Editing ${pContact1.name}'s name")
+//                var rName = scanner.nextLine()
+                var rName = getName()
+                pContact1.name = rName
+                while (true) {
+                    println("Would you like to continue editing  Y/N ? ")
+                    val getOption = scanner.nextLine()
+                    when (getOption) {
+                        "y" -> {
+                            editStart()
+                            break
+                        }
+                        "n" -> {
+                            showOption()
+                            break
+                        }
+                        else -> {
+                            println("Invalid input")
+                            println("press 'y' -> Yes")
+                            println("press 'y' -> cancel")
+                        }
+                    }
+                }
+
+            }
+            "2" -> {
+                while (true) {
+                    println("would you like to add or edit phone number (Y/N) ?")
+                    var option = scanner.nextLine()
+                    when (option) {
+
+                        "y" -> {
+//                            getPhoneNumberAgain()
+
+                            while (true) {
+
+                                println("Choose the type of phone number")
+                                println("1. Personal")
+                                println("2. work")
+                                println("3. Office")
+                                println("4. Other")
+
+                                var getOption = scanner.nextLine()
+                                when (getOption) {
+                                    "1" -> {
+                                        var number = getPersonalNumber()
+                                        pPhoneList.add(number)
+
+                                        pContact1.phoneNumber.put("Personal", pPhoneList)
+                                        break
+                                    }
+                                    "2" -> {
+                                        var number = getWorkNumber()
+                                        wPhoneList.add(number)
+                                        pContact1.phoneNumber.put("Work", wPhoneList)
+                                        break
+                                    }
+                                    "3" -> {
+                                        var number = getOfficeNumber()
+                                        oPhoneList.add(number)
+                                        pContact1.phoneNumber.put("Office", oPhoneList)
+                                        break
+                                    }
+                                    "4" -> {
+                                        var number = getOtherNumber()
+                                        otherPhoneList.add(number)
+                                        pContact1.phoneNumber.put("Other", otherPhoneList)
+                                        break
+                                    }
+                                    else -> {
+                                        println("Invalid input Enter a valid input")
+                                    }
+                                }
+                            }
+                            while (true) {
+                                println("Would you like to continue editing Y/N ? ")
+                                val getOption = scanner.nextLine()
+                                when (getOption) {
+                                    "y" -> {
+                                        editStart()
+                                    }
+                                    "n" -> {
+                                        showOption()
+//                                    break
+
+                                    }
+                                }
+
+                            }
+                        }
+                        "n" -> {
+                            showOption()
+//                            break
+
+                        }
+                        else -> {
+                            println("Invalid input")
+                            println("press 'y' -> Yes")
+                            println("press 'n' -> cancel")
+                        }
+                    }
+                }
+            }
+
+            "3" -> {
+                while (true) {
+                    println("would you like to add or edit EmailId (Y/N) ?")
+                    var option = scanner.nextLine()
+
+                    when (option) {
+                        "y" -> {
+//                            getMailId()
+
+                            while (true) {
+                                println("Choose the type of mailId")
+                                println("1. Personal")
+                                println("2. Office")
+                                println("3. Other")
+
+                                var getOption = scanner.nextLine()
+                                when (getOption) {
+                                    "1" -> {
+                                        var personalMail = getPersonalMailId()
+                                        personalMailList.add(personalMail)
+                                        pContact1.mailId.put("Personal", personalMailList)
+                                        break
+
+                                    }
+                                    "2" -> {
+                                        var officeMail = getOfficeMailId()
+                                        officeMailList.add(officeMail)
+                                        pContact1.mailId.put("Office", officeMailList)
+                                        break
+                                    }
+                                    "3" -> {
+                                        var otherMail = getOtherMailId()
+                                        otherMailList.add(otherMail)
+                                        pContact1.mailId.put("Other", otherMailList)
+                                        break
+                                    }
+
+                                    else -> {
+                                        println("Invalid input Enter a valid input")
+                                    }
+                                }
+                            }
+                            while (true) {
+                                println("Would you like to continue editing Y/N ? ")
+                                val getOption = scanner.nextLine()
+                                when (getOption) {
+                                    "y" -> {
+                                        editStart()
+                                    }
+                                    "n" -> {
+                                        break
+                                    }
+                                    else -> {
+                                        println("Invalid input")
+                                        println("press 'y' -> Yes")
+                                        println("press 'n' -> cancel")
+                                    }
+                                }
+                            }
+                        }
+                        "n" -> {
+                            break
+                        }
+                        else -> {
+                            println("Invalid input")
+                            println("press 'y' -> Yes")
+                            println("press 'n' -> cancel")
+                        }
+                    }
+                }
+            }
+            "4" -> {
+                while (true) {
+                    println("would you like to add Address (Y/N) ?")
+                    var option = scanner.nextLine()
+
+                    when (option) {
+                        "y" -> {
+//                            getAddress()
+                            while (true) {
+                                println("Choose the type of address")
+                                println("1. Home")
+                                println("2. Resident")
+                                println("3. Office")
+                                println("4. Other")
+
+                                var getOption = scanner.nextLine()
+                                when (getOption) {
+                                    "1" -> {
+                                        var home = getHomeAddress()
+                                        homeAddressList.add(home)
+
+                                        pContact1.address.put("Home", homeAddressList)
+                                        break
+
+                                    }
+                                    "2" -> {
+                                        var resident = getResidentAddress()
+                                        residentAddressList.add(resident)
+                                        pContact1.address.put("Resident", residentAddressList)
+                                        break
+                                    }
+                                    "3" -> {
+                                        var office = getOfficeAddress()
+                                        officeAddressList.add(office)
+                                        pContact1.address.put("Office", officeAddressList)
+                                        break
+                                    }
+                                    "4" -> {
+                                        var other = getOtherAddress()
+                                        otherAddressList.add(other)
+                                        pContact1.address.put("Other", otherAddressList)
+                                        break
+                                    }
+
+                                    else -> {
+                                        println("Invalid input Enter a valid input")
+                                    }
+                                }
+                            }
+                            while (true) {
+                                println("Would you like to continue editing Y/N ? ")
+                                val getOption = scanner.nextLine()
+                                when (getOption) {
+                                    "y" -> {
+                                        editStart()
+//                                    println("Enter position")
+//                                    var position = scanner.nextLine().toInt()
+//
+//                                    edit(contactList[position])
+                                    }
+                                    "n" -> {
+                                        break
+                                    }
+                                    else -> {
+                                        println("Invalid input")
+                                        println("press 'y' -> Yes")
+                                        println("press 'n' -> cancel")
+                                    }
+                                }
+
+                            }
+                        }
+                        "n" -> {
+                            break
+                        }
+                        else -> {
+                            println("Invalid input")
+                            println("press 'y' -> Yes")
+                            println("press 'n' -> cancel")
+                        }
+                    }
+                }
+            }
+            else -> {
+                println("Invalid input ")
+                println("Please enter the valid input")
+                editStart()
+                showOption()
+            }
+        }
+
+        showOption()
+    }
+
+    fun delete() {
+        display()
+        println("Enter position to delete")
+        try {
+
+
+            var dposition = scanner.nextLine().toInt()
+            if (dposition > contactList.size - 1) {
+                println("Enter a valid input")
+                delete()
+            }
+            while (true) {
+                println("Are you sure do you want to delete the contact  Y/N ?")
+                var delete = scanner.nextLine()
+                when (delete) {
+                    "y" -> {
+
+                        println("1 Contact deleted successfully")
+                        contactList.removeAt(dposition)
+                        break
+                    }
+                    "n" -> {
+                        break
+                    }
+                    else -> {
+                        println("Invalid input")
+                        println("press 'y' -> Yes")
+                        println("press 'n' -> cancel")
+                    }
+                }
+            }
+
+
+        } catch (e: Exception) {
+            println(e)
+            println("Invalid input Enter valid input")
+            delete()
+        }
+        showOption()
+
+    }
+
+
+    fun display() {
+
+        println("-----------------------------------------------------------------------------------------------------------------------------------")
+        println("                             contact details ")
+        println("-----------------------------------------------------------------------------------------------------------------------------------")
+
+        for (i in contactList.indices) {
+            var contacts = contactList[i]
+            println("Contact $i")
+            println("                     Name   -> ${contacts.name}")
+            println("                     Emails -> ${contacts.mailId.keys} ")
+            println("                            -> ${contacts.mailId.values}")
+            println("               phoneNumbers -> ${contacts.phoneNumber.keys}")
+            println("                            -> ${contacts.phoneNumber.values}")
+            println("                    Address -> ${contacts.address.keys} ")
+            println("                            -> ${contacts.address.values}")
+        }
+
+        println("----------------------------------------------------------------------------------------------------------------------------------")
+
+    }
+
+    fun getPhoneNumber() {
+        var phoneNumberMutableList = mutableListOf<String>()
+
+
+        println("Enter the type of number")
+        println("Example")
+        println("Personal, Work, Office,...as you want")
+
+
+        var keyOfNumber = scanner.nextLine()
+
+        println("Enter phoneNo : ")
+        var phoneNumber = scanner.nextLine()
+
+        if (phoneNumber.matches("[0-9]{10,11}\$".toRegex())) {
+            phoneNumberMutableList.add(phoneNumber)
+
+//            phoneMap1.put("personal", phoneNumberMutableList)
+        } else {
+            println("This is not a valid phone number")
+            println("Enter a valid phone number")
+            getPhoneNumber()
+        }
+
+    }
+
+    fun getPersonalNumber(): MutableList<String> {
+
+        var phoneNumberMutableList = mutableListOf<String>()
+
+        println("Enter phoneNumber")
+        var phoneNumber1 = scanner.nextLine()
+
+        if (phoneNumber1.matches("[0-9]{10,11}\$".toRegex())) {
+
+            phoneNumberMutableList.add(phoneNumber1)
+
+//            phoneMap1.put("Personal",phoneNumberMutableList )
+
+        } else {
+            println("This is not a valid phone number")
+            println("Enter a valid phone number")
+            phoneNumberMutableList = getPersonalNumber()
+            return phoneNumberMutableList
+        }
+        return phoneNumberMutableList
+    }
+
+    fun getWorkNumber(): MutableList<String> {
+        var phoneNumberMutableList = mutableListOf<String>()
+
+        println("Enter phoneNumber")
+        var phoneNumber1 = scanner.nextLine()
+
+        if (phoneNumber1.matches("[0-9]{10,11}\$".toRegex())) {
+
+            phoneNumberMutableList.add(phoneNumber1)
+
+//            phoneMap1.put("Work",phoneNumberMutableList )
+
+        } else {
+            println("This is not a valid phone number")
+            println("Enter a valid phone number")
+           phoneNumberMutableList = getWorkNumber()
+            return phoneNumberMutableList
+        }
+        return phoneNumberMutableList
+    }
+
+    fun getOfficeNumber(): MutableList<String> {
+        var phoneNumberMutableList = mutableListOf<String>()
+
+        println("Enter phoneNumber")
+        var phoneNumber1 = scanner.nextLine()
+
+        if (phoneNumber1.matches("[0-9]{10,11}\$".toRegex())) {
+
+            phoneNumberMutableList.add(phoneNumber1)
+
+//            phoneMap1.put("Office",phoneNumberMutableList )
+
+        } else {
+            println("This is not a valid phone number")
+            println("Enter a valid phone number")
+            phoneNumberMutableList = getOfficeNumber()
+            return phoneNumberMutableList
+        }
+        return phoneNumberMutableList
+    }
+
+    fun getOtherNumber(): MutableList<String> {
+        var phoneNumberMutableList = mutableListOf<String>()
+
+
+        println("Enter phoneNumber")
+        var phoneNumber1 = scanner.nextLine()
+
+        if (phoneNumber1.matches("[0-9]{10,11}\$".toRegex())) {
+            phoneNumberMutableList.add(phoneNumber1)
+
+//            phoneMap1.put("Other",phoneNumberMutableList )
+
+        } else {
+            println("This is not a valid phone number")
+            println("Enter a valid phone number")
+            phoneNumberMutableList = getOtherNumber()
+            return phoneNumberMutableList
+        }
+        return phoneNumberMutableList
+    }
+
+    fun getPhoneNumberAgain(): MutableMap<String, MutableList<String>> {
+        var phoneMap1 = mutableMapOf<String, MutableList<String>>()
+
+        println("Choose the type of phone number")
+        println("1. Personal")
+        println("2. Work")
+        println("3. Office")
+        println("4. Other")
+
+        var getOption = scanner.nextLine()
+        when (getOption) {
+            "1" -> {
+                var number = getPersonalNumber()
+                phoneMap1.put("Personal", number)
+            }
+            "2" -> {
+                var number = getWorkNumber()
+                phoneMap1.put("Work", number)
+            }
+            "3" -> {
+                var number = getOfficeNumber()
+                phoneMap1.put("Office", number)
+            }
+            "4" -> {
+                var number = getOtherNumber()
+                phoneMap1.put("Other", number)
+            }
+            else -> {
+                println("Invalid input Enter a valid input")
+                phoneMap1 = getPhoneNumberAgain()
+                return phoneMap1
+            }
+        }
+        return phoneMap1
+    }
+
+    fun getPersonalMailId(): MutableList<String> {
+        var mailMutableList = mutableListOf<String>()
+
+        println("Enter EmailId : ")
+        var mail = scanner.nextLine()
+        if (mail.matches("[^A-Z0-9._%+\\-=!@#(){}*^!~`?<>,][a-zA-Z0-9._]+@[a-z]+[.][a-z]{2,6}\$".toRegex())) {
+            mailMutableList.add(mail)
+        } else {
+            println("Invalid Email ID")
+            println("Enter the valid EmailID")
+            mailMutableList = getPersonalMailId()
+            return mailMutableList
+        }
+
+        return mailMutableList
+
+    }
+
+    fun getOfficeMailId(): MutableList<String> {
+        var mailMutableList = mutableListOf<String>()
+
+
+        println("Enter EmailId : ")
+        var mail = scanner.nextLine()
+        if (mail.matches("[^A-Z0-9._%+\\-=!@#(){}*^!~`?<>,][a-zA-Z0-9._]+@[a-z]+[.][a-z]{2,6}\$".toRegex())) {
+            mailMutableList.add(mail)
+//            return mailMutableList
+
+        } else {
+            println("Invalid Email ID")
+            println("Enter the valid EmailID")
+             mailMutableList = getOfficeMailId()
+            return mailMutableList
+        }
+        return mailMutableList
+    }
+
+    fun getOtherMailId(): MutableList<String> {
+
+        var mailMutableList = mutableListOf<String>()
+
+        println("Enter EmailId : ")
+        var mail = scanner.nextLine()
+        if (mail.matches("[^A-Z0-9._%+\\-=!@#(){}*^!~`?<>,][a-zA-Z0-9._]+@[a-z]+[.][a-z]{2,6}\$".toRegex())) {
+            mailMutableList.add(mail)
+        } else {
+            println("Invalid Email ID")
+            println("Enter the valid EmailID")
+            mailMutableList = getOtherMailId()
+            return mailMutableList
+        }
+        return mailMutableList
+
+    }
+
+
+    fun getMailId(): MutableMap<String, MutableList<String>> {
+
+        var mutableEmailMap = mutableMapOf<String, MutableList<String>>()
+        println("Choose the type of mailId")
+        println("1. Personal")
+        println("2. Office")
+        println("3. Other")
+
+        var getOption = scanner.nextLine()
+        when (getOption) {
+            "1" -> {
+                var personalMail = getPersonalMailId()
+                mutableEmailMap.put("Personal", personalMail)
+
+            }
+            "2" -> {
+                var officeMail = getOfficeMailId()
+                mutableEmailMap.put("Office", officeMail)
+            }
+            "3" -> {
+                var otherMail = getOtherMailId()
+                mutableEmailMap.put("Other", otherMail)
+            }
+
+            else -> {
+                println("Invalid input Enter a valid input")
+                mutableEmailMap = getMailId()
+                return mutableEmailMap
+            }
+        }
+        return mutableEmailMap
+    }
+
+
+    fun getDoorNumber(): String {
+        println("Address")
+        println("Enter Door/Flat number")
+        var dNum = scanner.nextLine()
+
+        if (dNum.isEmpty() || dNum.isBlank()) {
+            println("Invalid input ")
+            println("Please Enter the valid input ")
+            dNum = getDoorNumber()
+            return dNum
+        }
+        return dNum
+    }
+
+    fun getStreetName(): String {
+        println("Enter street")
+        var street = scanner.nextLine()
+        if (street.isEmpty() || street.isBlank()) {
+            println("Invalid input ")
+            println("Please Enter the valid input ")
+            street = getStreetName()
+            return street
+        }
+        if (street.matches("[a-zA-Z]{3,20}\$".toRegex())){
+            street = street
+        }else{
+            println("Enter valid input")
+            street = getStreetName()
+        }
+        return street
+    }
+
+    fun getPost(): String {
+        println("Enter post ")
+        var post = scanner.nextLine()
+        if (post.isEmpty() || post.isBlank()) {
+            println("Invalid input ")
+            println("Please Enter the valid input ")
+           post =  getPost()
+            return post
+        }
+        if (post.matches("[a-zA-Z]{3,20}\$".toRegex())){
+            post = post
+        }else{
+            println("Enter valid input")
+            post = getPost()
+        }
+        return post
+    }
+
+    fun getDistrict(): String {
+        println("Enter District")
+        var district = scanner.nextLine()
+        if (district.isBlank() || district.isBlank()) {
+            println("Invalid input ")
+            println("Please Enter the valid input ")
+            district = getDistrict()
+            return district
+        }
+        if (district.matches("[a-zA-Z]{3,20}\$".toRegex())){
+            district = district
+        }else{
+            println("Enter valid input")
+            district = getDistrict()
+        }
+        return district
+    }
+
+    fun getState(): String {
+        println("Enter State ")
+        var state = scanner.nextLine()
+        if (state.isBlank() || state.isBlank()) {
+            println("Invalid input ")
+            println("Please Enter the valid input ")
+            state = getState()
+            return state
+        }
+        if (state.matches("[a-zA-Z]{3,20}\$".toRegex())){
+            state = state
+        }else{
+            println("Enter valid input")
+            state = getState()
+        }
+        return state
+    }
+
+    fun getPinCode(): String {
+        println("Enter pin code")
+        var pinCode = scanner.nextLine()
+        if (pinCode.matches("[0-9]{6}\$".toRegex())) {
+
+        } else {
+            println("Invalid input ")
+            println("Please Enter the valid input ")
+            pinCode = getPinCode()
+            return pinCode
+        }
+        return pinCode
+    }
+
+    fun getAddressDetails(): MutableList<Address> {
+        var addressMutableList = mutableListOf<Address>()
+
+        var doorNumber = getDoorNumber()
+
+        var streetName = getStreetName()
+
+        var post = getPost()
+
+        var district = getDistrict()
+
+        var state = getState()
+
+        var pinCode = getPinCode()
+
+        var address =
+            Address(doorNumber, streetName, post, district, state, pinCode)
+        addressMutableList.add(address)
+        return addressMutableList
+    }
+
+    fun getHomeAddress(): MutableList<Address> {
+        var addressMutableList = getAddressDetails()
+
+
+        return addressMutableList
+
+    }
+
+    fun getResidentAddress(): MutableList<Address> {
+        var addressMutableList = getAddressDetails()
+
+        return addressMutableList
+
+    }
+
+    fun getOfficeAddress(): MutableList<Address> {
+
+        var addressMutableList = getAddressDetails()
+
+        return addressMutableList
+    }
+
+    fun getOtherAddress(): MutableList<Address> {
+
+        var addressMutableList = getAddressDetails()
+
+        return addressMutableList
+
+    }
+
+    fun getAddress(): MutableMap<String, MutableList<Address>> {
+        var addressMap = mutableMapOf<String, MutableList<Address>>()
+
+        println("Choose the type of address")
+        println("1. Home")
+        println("2. Resident")
+        println("3. Office")
+        println("4. Other")
+
+        var getOption = scanner.nextLine()
+        when (getOption) {
+            "1" -> {
+                var home = getHomeAddress()
+                addressMap.put("Home", home)
+
+            }
+            "2" -> {
+                var resident = getResidentAddress()
+                addressMap.put("Resident", resident)
+            }
+            "3" -> {
+                var office = getOfficeAddress()
+                addressMap.put("Office", office)
+            }
+            "4" -> {
+                var other = getOtherAddress()
+                addressMap.put("Other", other)
+            }
+
+            else -> {
+                println("Invalid input Enter a valid input")
+                addressMap = getAddress()
+                return addressMap
+            }
+        }
+        return addressMap
+    }
+    fun getName():String{
+        println("Enter Name : ")
+        var name = scanner.nextLine()
+        if (name.isEmpty() || name.isBlank()) {
+            println("Please enter your name")
+          name =  getName()
+        }
+        if (name.matches("[a-zA-Z]{3,20}\$".toRegex())){
+name = name
+        }else{
+            println("Enter valid input")
+            name = getName()
+        }
+        return name
+    }
+
+    fun createContact() {
+        var pPhoneList = mutableListOf<MutableList<String>>()
+        var wPhoneList = mutableListOf<MutableList<String>>()
+        var oPhoneList = mutableListOf<MutableList<String>>()
+        var otherPhoneList = mutableListOf<MutableList<String>>()
+
+        var personalMailList = mutableListOf<MutableList<String>>()
+        var officeMailList = mutableListOf<MutableList<String>>()
+        var otherMailList = mutableListOf<MutableList<String>>()
+
+        var homeAddressList = mutableListOf<MutableList<Address>>()
+        var residentAddressList = mutableListOf<MutableList<Address>>()
+        var officeAddressList = mutableListOf<MutableList<Address>>()
+        var otherAddressList = mutableListOf<MutableList<Address>>()
+
+
+        var phoneMap1 = mutableMapOf<String, MutableList<MutableList<String>>>()
+        var emailMap = mutableMapOf<String, MutableList<MutableList<String>>>()
+        var addressMap = mutableMapOf<String, MutableList<MutableList<Address>>>()
+
+
+
+            var name = getName()
+
+
+
+        while (true) {
+
+            println("Choose the type of phone number")
+            println("1. Personal")
+            println("2. work")
+            println("3. Office")
+            println("4. Other")
+
+            var getOption = scanner.nextLine()
+            when (getOption) {
+                "1" -> {
+
+
+                    var number = getPersonalNumber()
+                    pPhoneList.add(number)
+                    break
+
+
+                }
+                "2" -> {
+                    var number = getWorkNumber()
+                    wPhoneList.add(number)
+//                    phoneMap1.put("Work", number)
+                    break
+                }
+                "3" -> {
+                    var number = getOfficeNumber()
+                    oPhoneList.add(number)
+//                    phoneMap1.put("Office", number)
+                    break
+                }
+                "4" -> {
+                    var number = getOtherNumber()
+                    otherPhoneList.add(number)
+//                    phoneMap1.put("Other", number)
+                    break
+                }
+                else -> {
+                    println("Invalid input Enter a valid input")
+                }
+            }
+        }
+
+
+        while (true) {
+            println("Would you like to add other number? (Y/N)")
+            var option = scanner.nextLine()
+            when (option) {
+                "y" -> {
+                    while (true) {
+
+                        println("Choose the type of phone number")
+                        println("1. Personal")
+                        println("2. work")
+                        println("3. Office")
+                        println("4. Other")
+
+                        var getOption = scanner.nextLine()
+                        when (getOption) {
+                            "1" -> {
+                                var number = getPersonalNumber()
+                                pPhoneList.add(number)
+
+//                                phoneMap1.put("Personal", number)
+                                break
+                            }
+                            "2" -> {
+                                var number = getWorkNumber()
+                                wPhoneList.add(number)
+//                                phoneMap1.put("Work", number)
+                                break
+                            }
+                            "3" -> {
+                                var number = getOfficeNumber()
+                                oPhoneList.add(number)
+//                                phoneMap1.put("Office", number)
+                                break
+                            }
+                            "4" -> {
+                                var number = getOtherNumber()
+                                otherPhoneList.add(number)
+//                                phoneMap1.put("Other", number)
+                                break
+                            }
+                            else -> {
+                                println("Invalid input Enter a valid input")
+                            }
+                        }
+                    }
+                }
+                "n" -> {
+                    phoneMap1.put("Personal", pPhoneList)
+                    phoneMap1.put("Work", wPhoneList)
+                    phoneMap1.put("Office", oPhoneList)
+                    phoneMap1.put("Other", otherPhoneList)
+
+                    break
+
+                }
+                else -> {
+                    println("Invalid input")
+                    println("press 'y' -> Yes")
+                    println("press 'n' -> No")
+                }
+            }
+        }
+
+        while (true) {
+            println("would you like to add email ID Y/N ?")
+            var getInput = scanner.nextLine()
+            when (getInput) {
+                "y" -> {
+                    while (true) {
+                        println("Choose the type of mailId")
+                        println("1. Personal")
+                        println("2. Office")
+                        println("3. Other")
+
+                        var getOption = scanner.nextLine()
+                        when (getOption) {
+                            "1" -> {
+                                var personalMail = getPersonalMailId()
+                                personalMailList.add(personalMail)
+//
+                                break
+
+                            }
+                            "2" -> {
+                                var officeMail = getOfficeMailId()
+                                officeMailList.add(officeMail)
+                                break
+                            }
+                            "3" -> {
+                                var otherMail = getOtherMailId()
+                                otherMailList.add(otherMail)
+//                                emailMap.put("Other", otherMail)
+                                break
+                            }
+
+                            else -> {
+                                println("Invalid input Enter a valid input")
+                            }
+                        }
+                    }
+                    break
+                }
+                "n" -> {
+                    break
+                }
+                else -> {
+                    println("Invalid input")
+                    println("press 'y' -> Yes")
+                    println("press 'n' -> No")
+                }
+
+
+            }
+        }
+        while (true) {
+            println("Would you like to add other EmailId? (Y/N)")
+            var option = scanner.nextLine()
+            when (option) {
+                "y" -> {
+                    while (true) {
+                        println("Choose the type of mailId")
+                        println("1. Personal")
+                        println("2. Office")
+                        println("3. Other")
+
+                        var getOption = scanner.nextLine()
+                        when (getOption) {
+                            "1" -> {
+                                var personalMail = getPersonalMailId()
+                                personalMailList.add(personalMail)
+//                                emailMap.put("Personal", personalMail)
+                                break
+
+                            }
+                            "2" -> {
+                                var officeMail = getOfficeMailId()
+                                officeMailList.add(officeMail)
+//                                emailMap.put("Office", officeMail)
+                                break
+                            }
+                            "3" -> {
+                                var otherMail = getOtherMailId()
+                                otherMailList.add(otherMail)
+//                                emailMap.put("Other", otherMail)
+                                break
+                            }
+
+                            else -> {
+                                println("Invalid input Enter a valid input")
+                            }
+                        }
+                    }
+                }
+
+
+                "n" -> {
+                    emailMap.put("Personal", personalMailList)
+                    emailMap.put("Office", officeMailList)
+                    emailMap.put("Other", otherMailList)
+                    break
+                }
+                else -> {
+                    println("Invalid input")
+                    println("press 'y' -> Yes")
+                    println("press 'n' -> No")
+                }
+            }
+        }
+
+        while (true) {
+            println("Would you like to add  address? (y/n)")
+            var option1 = scanner.nextLine()
+            when (option1) {
+                "y" -> {
+                    while (true) {
+                        println("Choose the type of address")
+                        println("1. Home")
+                        println("2. Resident")
+                        println("3. Office")
+                        println("4. Other")
+
+                        var getOption = scanner.nextLine()
+                        when (getOption) {
+                            "1" -> {
+                                var home = getHomeAddress()
+                                homeAddressList.add(home)
+//                                addressMap.put("Home", home)
+                                break
+
+                            }
+                            "2" -> {
+                                var resident = getResidentAddress()
+                                residentAddressList.add(resident)
+//                                addressMap.put("Resident", resident)
+                                break
+                            }
+                            "3" -> {
+                                var office = getOfficeAddress()
+                                officeAddressList.add(office)
+//                                addressMap.put("Office", office)
+                                break
+                            }
+                            "4" -> {
+                                var other = getOtherAddress()
+                                otherAddressList.add(other)
+//                                addressMap.put("Other", other)
+                                break
+                            }
+
+                            else -> {
+                                println("Invalid input Enter a valid input")
+                            }
+                        }
+                    }
+                    break
+                }
+                "n" -> {
+                    addressMap.put("Home", homeAddressList)
+                    addressMap.put("Resident", residentAddressList)
+                    addressMap.put("Office", officeAddressList)
+                    addressMap.put("Other", otherAddressList)
+                    break
+                }
+                else -> {
+                    println("Invalid input")
+                    println("press 'y' -> Yes")
+                    println("press 'n' -> cancel")
+                }
+            }
+        }
+
+        while (true) {
+            println("Would you like to add other address? (Y/N)")
+            var option2 = scanner.nextLine()
+            when (option2) {
+                "y" -> {
+                    while (true) {
+                        println("Choose the type of address")
+                        println("1. Home")
+                        println("2. Resident")
+                        println("3. Office")
+                        println("4. Other")
+
+                        var getOption = scanner.nextLine()
+                        when (getOption) {
+                            "1" -> {
+                                var home = getHomeAddress()
+                                homeAddressList.add(home)
+//                                addressMap.put("Home", home)
+                                break
+
+                            }
+                            "2" -> {
+                                var resident = getResidentAddress()
+                                residentAddressList.add(resident)
+//                                addressMap.put("Resident", resident)
+                                break
+                            }
+                            "3" -> {
+                                var office = getOfficeAddress()
+                                officeAddressList.add(office)
+//                                addressMap.put("Office", office)
+                                break
+                            }
+                            "4" -> {
+                                var other = getOtherAddress()
+                                otherAddressList.add(other)
+//                                addressMap.put("Other", other)
+                                break
+                            }
+
+                            else -> {
+                                println("Invalid input Enter a valid input")
+                            }
+                        }
+                    }
+                }
+                "n" -> {
+                    addressMap.put("Home", homeAddressList)
+                    addressMap.put("Resident", residentAddressList)
+                    addressMap.put("Office", officeAddressList)
+                    addressMap.put("Other", otherAddressList)
+                    break
+                }
+                else -> {
+                    println("Invalid input")
+                    println("press 'y' -> Yes")
+                    println("press 'n' -> cancel")
+                }
+            }
+        }
+        var lContact = Contact(
+            name,
+            phoneMap1,
+            emailMap,
+            addressMap
+        )
+        while (true) {
+            println("would you like to  save Yes or No Y/N ?")
+            var Yes = scanner.nextLine()
+            when (Yes) {
+                "y" -> {
+                    contactList.add(lContact).toString()
+                    break
+                }
+                "n" -> {
+                    break
+                }
+                else -> {
+                    println("Invalid input")
+                    println("press 'y' -> Yes")
+                    println("press 'n' -> No")
+
+
+                }
+            }
+        }
+        showOption()
+    }
+
+}
+
+
+//        fun methodOne() {
+//            println("Thanks for using my application")
+//        }
+//
+//        fun printName(count: Int) {
+//            for (i in 0..count) {
+//                print("This is my line : $i")
+//            }
+//        }
+//
+//        fun getName(): String {
+//            print("Enter Name : ")
+//            var name = scanner.nextLine()
+//            if (name.isEmpty()) {
+//                println("Wrong input, try again!")
+//                return getName()
+//            }
+//
+//            return name
+//        }
+//
+
+
+
+
+
+
+
